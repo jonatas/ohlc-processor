@@ -11,13 +11,23 @@ defmodule Ohlc do
         low: event.price,
         close: event.price,
         volume: event.size
-       IO.inspect bar
     end
     def process(Ohlc.Bar[] = bar, Ohlc.Event[] = event) do
-       if event.price > bar.high, do: bar = bar.high(event.price)
-       if event.price > bar.high, do: bar = bar.low(event.price) 
-       bar = bar.close event.price
-       bar
+      bar |> 
+        _high(event.price) |>
+          _low(event.price) |>
+            _close(event.price) |>
+              _sum_volume(event.size)
     end
+    def _high(Ohlc.Bar[] = bar, price) do
+      if price > bar.high, do: bar = bar.high(price) 
+      bar 
+    end
+    def _low(Ohlc.Bar[] = bar, price) do
+      if price < bar.low, do: bar = bar.low(price) 
+      bar 
+    end
+    def _close(Ohlc.Bar[] = bar, price), do: bar = bar.close(price) 
+    def _sum_volume(Ohlc.Bar[] = bar, trade_size), do: bar = bar.volume(bar.volume + trade_size) 
   end
 end
