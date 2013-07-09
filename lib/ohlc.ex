@@ -14,15 +14,11 @@ defmodule Ohlc do
     end
     def process(Ohlc.Bar[] = bar, Ohlc.Event[] = event) do
       price = event.price
-      bar |> _high(price) |> _low(price) |> _close(price) |> _sum_volume(event.size)
-    end
-    def _high(Ohlc.Bar[] = bar, price) do
-      if price > bar.high, do: bar = bar.high(price) 
-      bar 
-    end
-    def _low(Ohlc.Bar[] = bar, price) do
-      if price < bar.low, do: bar = bar.low(price) 
-      bar 
+      cond do
+        price > bar.high -> bar=bar.high(price)
+        price < bar.low -> bar=bar.low(price)
+      end
+      bar |> _close(price) |> _sum_volume(event.size)
     end
     def _close(Ohlc.Bar[] = bar, price), do: bar.close(price) 
     def _sum_volume(Ohlc.Bar[] = bar, trade_size), do: bar.volume(bar.volume + trade_size) 
