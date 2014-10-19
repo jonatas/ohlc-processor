@@ -3,17 +3,16 @@ Code.require_file "benchmark.ex", __DIR__
 
 defmodule OhlcTest do
   use ExUnit.Case
+
   require Benchmark
-  # see "big",Benchmark.times(2, do: Ohlc.load_ticks(filename))
   defp see what, benchmark do
     IO.inspect(what)
     IO.inspect(benchmark)
-    IO.inspect(">>>>>>>>>>>>>")
   end
 
   test "compute events on bar" do
-    trade = Ohlc.Event.new time: Ohlc.now, price: 52.2, size: 5
-    bar = Ohlc.Bar.process trade
+    trade = OHLC.Event.new time: OHLC.now, price: 52.2, size: 5
+    bar = OHLC.Bar.process trade
     assert(bar != nil)
     assert bar.open_time == trade.time
     assert(bar.open == trade.price)
@@ -21,8 +20,8 @@ defmodule OhlcTest do
     assert(bar.low == trade.price)
     assert(bar.close == trade.price)
     assert(bar.volume == trade.size)
-    last_event = Ohlc.Event.new(time: Ohlc.now, price: 52.9, size: 3)
-    bar = Ohlc.Bar.process bar, last_event
+    last_event = OHLC.Event.new(time: OHLC.now, price: 52.9, size: 3)
+    bar = OHLC.Bar.process bar, last_event
     assert bar.open == trade.price
     assert bar.high == last_event.price
     assert bar.close == last_event.price
@@ -30,14 +29,22 @@ defmodule OhlcTest do
   end
   test "compute 10 events from a file" do
     filename = "test/fixtures/10trades.csv"
-    IO.inspect(Ohlc.load_ticks(filename))
+    IO.inspect(OHLC.load_ticks(filename))
+  end
+  test "benchmarking 10 events" do
+    filename = "test/fixtures/10trades.csv"
+    see "10 times 10 events",Benchmark.times(10, do: OHLC.load_ticks(filename))
   end
   test "compute 100.000 events from a small file" do
-    #  filename = "test/fixtures/trades.csv"
-    #IO.inspect(Ohlc.load_ticks(filename))
+    filename = "test/fixtures/trades.csv"
+    OHLC.load_ticks(filename)
   end
-   test "compute 900.000 events from big file" do
-     filename = "test/fixtures/ticks.csv"
-     #Ohlc.load_ticks(filename)
-   end
+  test "compute 1000 events from a small file" do
+    filename = "test/fixtures/1000trades.csv"
+    OHLC.load_ticks(filename)
+  end
+  test "compute 900.000 events from big file" do
+    filename = "test/fixtures/ticks.csv"
+    OHLC.load_ticks(filename)
+  end
 end
