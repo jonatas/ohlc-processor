@@ -21,7 +21,7 @@ defmodule OhlcTest do
     assert(bar.close == trade.price)
     assert(bar.volume == trade.size)
     last_event = OHLC.Event.new(time: OHLC.now, price: 52.9, size: 3)
-    bar = OHLC.Bar.process bar, last_event
+    bar = bar |> OHLC.Bar.process last_event
     assert bar.open == trade.price
     assert bar.high == last_event.price
     assert bar.close == last_event.price
